@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:pido_app/widgets/photo_upload_widget.dart';
+import '../constants/app_constants.dart';
+import '../utils/responsive_dimensions.dart';
+import '../utils/responsive_text_styles.dart';
+import '../core/services/permission_service.dart';
+import '../routes/app_router.dart';
 
 class WorkspaceVerificationScreen extends StatelessWidget {
   const WorkspaceVerificationScreen({super.key});
@@ -7,107 +11,77 @@ class WorkspaceVerificationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.background,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.black, size: 20),
+          icon: Icon(
+            Icons.arrow_back_ios,
+            color: AppColors.textPrimary,
+            size: ResponsiveDimensions.iconS(context),
+          ),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
-        title: const Text(
-          'Verification of Workspace',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-          ),
+        title: Text(
+          AppStrings.workspaceVerificationTitle,
+          style: ResponsiveTextStyles.appBarTitle(context),
         ),
         centerTitle: false,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(24.0),
+        padding: EdgeInsets.all(context.screenPadding),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 20),
-            const Text(
-              'Take a Picture',
-              style: TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
+            SizedBox(height: context.itemSpacing),
+            Text(
+              AppStrings.takePictureTitle,
+              style: ResponsiveTextStyles.heading1(context),
             ),
-            const SizedBox(height: 8),
-            const Text(
-              'Take a picture of your workspace',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey,
-                fontWeight: FontWeight.w400,
-              ),
+            SizedBox(height: context.rpS),
+            Text(
+              AppStrings.takePictureSubtitle,
+              style: ResponsiveTextStyles.bodyLargeSecondary(context),
             ),
-            const SizedBox(height: 40),
-            const Text(
-              'Before you start:',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
-                color: Colors.black,
-              ),
+            SizedBox(height: context.sectionSpacing),
+            Text(
+              AppStrings.beforeYouStartTitle,
+              style: ResponsiveTextStyles.heading5(context),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: context.rpL),
             _buildInstructionItem(
               icon: Icons.person,
-              iconColor: const Color(0xFF8B5CF6),
-              title: "Don't worry about how you look.",
-              subtitle: "Our bots love you either way!",
+              iconColor: AppColors.primaryPurple,
+              title: AppStrings.instructionDontWorry,
+              subtitle: AppStrings.instructionDontWorrySubtitle,
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: context.itemSpacing),
             _buildInstructionItem(
               icon: Icons.wb_sunny,
-              iconColor: const Color(0xFFFF8C00),
-              title: "Find good lighting so your face is",
-              subtitle: "seen clearly on-screen.",
+              iconColor: AppColors.primaryOrange,
+              title: AppStrings.instructionLighting,
+              subtitle: AppStrings.instructionLightingSubtitle,
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: context.itemSpacing),
             _buildInstructionItem(
               icon: Icons.face,
-              iconColor: const Color(0xFF8B5CF6),
-              title: "Try not to smile and remove anything",
-              subtitle: "covering your face (e.g glasses, hat\nor scarf)",
+              iconColor: AppColors.primaryPurple,
+              title: AppStrings.instructionSmile,
+              subtitle: AppStrings.instructionSmileSubtitle,
             ),
-            const SizedBox(height: 40),
+            SizedBox(height: context.sectionSpacing),
             Container(
               width: double.infinity,
-              height: 56,
-              margin: const EdgeInsets.only(bottom: 40),
+              height: ResponsiveDimensions.buttonHeightL(context),
+              margin: EdgeInsets.only(bottom: context.sectionSpacing),
               child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const CameraCaptureScreen(),
-                    ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFF8C00),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(28),
-                  ),
-                  elevation: 0,
-                ),
-                child: const Text(
-                  'Take Picture',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  ),
+                onPressed: () => _handleTakePicturePressed(context),
+                child: Text(
+                  AppStrings.takePictureButton,
+                  style: ResponsiveTextStyles.buttonLarge(context),
                 ),
               ),
             ),
@@ -117,58 +91,85 @@ class WorkspaceVerificationScreen extends StatelessWidget {
     );
   }
 
+  Future<void> _handleTakePicturePressed(BuildContext context) async {
+    final permissionService = PermissionService();
+
+    // Check if camera permission is already granted
+    if (permissionService.isCameraGranted) {
+      _navigateToCamera(context);
+      return;
+    }
+
+    // Request camera permissions using the global service
+    final granted = await permissionService.requestCameraPermission(context);
+
+    if (!context.mounted) return;
+
+    if (granted) {
+      _navigateToCamera(context);
+    } else {
+      // Permission denied - the global service already showed appropriate dialogs
+      permissionService.showPermissionDeniedSnackbar(
+        context,
+        AppStrings.cameraPermissionDenied,
+      );
+    }
+  }
+
+  void _navigateToCamera(BuildContext context) {
+    context.goToCamera();
+  }
+
   Widget _buildInstructionItem({
     required IconData icon,
     required Color iconColor,
     required String title,
     required String subtitle,
   }) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          width: 48,
-          height: 48,
-          decoration: BoxDecoration(
-            color: iconColor.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(24),
+    return Builder(
+      builder: (context) => Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: ResponsiveDimensions.instructionIconContainer(context),
+            height: ResponsiveDimensions.instructionIconContainer(context),
+            decoration: BoxDecoration(
+              color: iconColor.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(context.rrXL),
+            ),
+            child: Icon(
+              icon,
+              color: iconColor,
+              size: ResponsiveDimensions.iconM(context),
+            ),
           ),
-          child: Icon(icon, color: iconColor, size: 24),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              RichText(
-                text: TextSpan(
-                  children: [
-                    TextSpan(
-                      text: title,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black,
-                        height: 1.4,
+          SizedBox(width: context.rpM),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                RichText(
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: title,
+                        style: ResponsiveTextStyles.instructionTitle(context),
                       ),
-                    ),
-                    const TextSpan(text: ' '),
-                    TextSpan(
-                      text: subtitle,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
-                        color: Colors.black,
-                        height: 1.4,
+                      const TextSpan(text: ' '),
+                      TextSpan(
+                        text: subtitle,
+                        style: ResponsiveTextStyles.instructionSubtitle(
+                          context,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

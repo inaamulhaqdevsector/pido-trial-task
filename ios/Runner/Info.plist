@@ -53,5 +53,24 @@
 	<string>This app needs access to photo library to select workspace photos for your booking.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>This app needs access to save compressed photos to your photo library.</string>
+	
+	<!-- Additional iOS 14+ Privacy Settings -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app may need location access for workspace verification purposes.</string>
+	
+	<!-- Local Network Access for Flutter Development Tools -->
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>This app uses local network access for development and debugging purposes.</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_dartobservatory._tcp</string>
+		<string>_dartobservatory._udp</string>
+	</array>
+	
+	<!-- Prevent app from being killed when using camera -->
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+	</array>
 </dict>
 </plist>

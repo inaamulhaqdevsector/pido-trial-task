@@ -1,0 +1,2 @@
+// Placeholder file for icon assets
+// This file can be removed once actual icon files are added

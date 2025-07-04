@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pido_app/services/image_service.dart';
+import 'package:pido_app/core/services/image_service.dart';
 import 'package:image/image.dart' as img;
 
 void main() {
@@ -25,7 +25,7 @@ void main() {
 
       // Test should pass regardless - compression logic handles any size
       expect(
-        largeImageBytes.length > 0,
+        largeImageBytes.isNotEmpty,
         true,
         reason: 'Test image should have some size',
       );
