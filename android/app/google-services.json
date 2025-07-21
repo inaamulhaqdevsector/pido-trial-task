@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "947546313629",
+    "project_id": "pido-app",
+    "storage_bucket": "pido-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:947546313629:android:fc64a1e3dadc662ff69574",
+        "android_client_info": {
+          "package_name": "com.example.pido_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBsVFQCmsoKIbyOTef-EYuUMtOUOFTvaOk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
